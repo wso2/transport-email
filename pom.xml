@@ -24,17 +24,13 @@
     </parent>
     <packaging>pom</packaging>
     <groupId>org.wso2.carbon.transport</groupId>
-    <artifactId>org.wso2.carbon.transport.parent</artifactId>
+    <artifactId>org.wso2.carbon.transport.email.parent</artifactId>
     <version>6.0.48-SNAPSHOT</version>
     <name>WSO2 Carbon Transport Parent</name>
 
     <modules>
-        <module>connector-framework</module>
-        <module>http</module>
-        <module>jms</module>
-        <module>file</module>
-        <module>email</module>
-        <module>features</module>
+        <!--<module>features/org.wso2.carbon.transport.email.feature</module>-->
+        <module>components/org.wso2.carbon.transport.email</module>
     </modules>
 
     <scm>

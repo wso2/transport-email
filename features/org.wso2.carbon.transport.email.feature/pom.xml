@@ -18,10 +18,10 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>org.wso2.carbon.transport.email.feature.parent</artifactId>
+        <artifactId>org.wso2.carbon.transport.email.parent</artifactId>
         <groupId>org.wso2.carbon.transport</groupId>
         <version>6.0.48-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.transport.email.feature</artifactId>
@@ -50,7 +50,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <propertyFile>../../etc/feature.properties</propertyFile>
+                            <propertyFile>../etc/feature.properties</propertyFile>
                             <adviceFileContents>
                                 <advice>
                                     <name>org.eclipse.equinox.p2.type.group</name>
@@ -59,7 +59,7 @@
                             </adviceFileContents>
                             <bundles>
                                 <bundle>
-                                    <symbolicName>org.wso2.carbon.transport.file</symbolicName>
+                                    <symbolicName>org.wso2.carbon.transport.email</symbolicName>
                                     <version>${project.version}</version>
                                 </bundle>
                             </bundles>
