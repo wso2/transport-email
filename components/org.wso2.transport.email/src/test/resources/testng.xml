@@ -23,9 +23,9 @@
 
     <test name="Transport test">
         <classes>
-            <class name="org.wso2.carbon.transport.email.client.connector.SmtpServerMailTestCase"/>
-            <class name="org.wso2.carbon.transport.email.server.connector.EmailServerConnectorViaImapTestCase"/>
-            <class name="org.wso2.carbon.transport.email.server.connector.EmailServerConnectorViaPop3TestCase"/>
+            <class name="org.wso2.transport.email.client.connector.SmtpServerMailTestCase"/>
+            <class name="org.wso2.transport.email.server.connector.EmailServerConnectorViaImapTestCase"/>
+            <class name="org.wso2.transport.email.server.connector.EmailServerConnectorViaPop3TestCase"/>
         </classes>
     </test>
 

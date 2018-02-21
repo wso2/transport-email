@@ -23,14 +23,14 @@
         <version>5</version>
     </parent>
     <packaging>pom</packaging>
-    <groupId>org.wso2.carbon.transport</groupId>
-    <artifactId>org.wso2.carbon.transport.email.parent</artifactId>
+    <groupId>org.wso2.transport</groupId>
+    <artifactId>org.wso2.transport.email.parent</artifactId>
     <version>6.0.48-SNAPSHOT</version>
     <name>WSO2 Carbon Transport Parent</name>
 
     <modules>
         <!--<module>features/org.wso2.carbon.transport.email.feature</module>-->
-        <module>components/org.wso2.carbon.transport.email</module>
+        <module>components/org.wso2.transport.email</module>
     </modules>
 
     <scm>
@@ -59,8 +59,8 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.transport</groupId>
-                <artifactId>org.wso2.carbon.transport.email</artifactId>
+                <groupId>org.wso2.transport</groupId>
+                <artifactId>org.wso2.transport.email</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

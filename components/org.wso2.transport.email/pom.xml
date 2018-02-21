@@ -18,8 +18,8 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>org.wso2.carbon.transport.email.parent</artifactId>
-        <groupId>org.wso2.carbon.transport</groupId>
+        <artifactId>org.wso2.transport.email.parent</artifactId>
+        <groupId>org.wso2.transport</groupId>
         <version>6.0.48-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <name>WSO2 Carbon Transport Email Component</name>
-    <artifactId>org.wso2.carbon.transport.email</artifactId>
+    <artifactId>org.wso2.transport.email</artifactId>
 
     <dependencies>
         <dependency>
@@ -96,10 +96,10 @@
             org.wso2.carbon.transport.email.*;version="${email.transport.package.export.version}"
         </export.package>
         <import.package>
-            org.slf4j.*;version="${slf4j.logging.package.import.version.range}",
-            org.wso2.carbon.messaging.*;version="${carbon.messaging.package.import.version.range}",
-            com.sun.mail.*;version="${com.sun.mail.import.version.range}",
-            org.wso2.carbon.connector.framework.*;version="${connector.framework.package.export.version}",
+            <!--org.slf4j.*;version="${slf4j.logging.package.import.version.range}",-->
+            <!--org.wso2.carbon.messaging.*;version="${carbon.messaging.package.import.version.range}",-->
+            <!--com.sun.mail.*;version="${com.sun.mail.import.version.range}",-->
+            <!--org.wso2.carbon.connector.framework.*;version="${connector.framework.package.export.version}",-->
         </import.package>
     </properties>
 </project>
