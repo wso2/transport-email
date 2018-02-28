@@ -120,16 +120,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven.checkstyle.plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${maven.findbugs.plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <preparationGoals>clean install</preparationGoals>
@@ -165,8 +155,6 @@
         <com.sun.mail.import.version.range>[1.5.0, 1.6.0-rc2)</com.sun.mail.import.version.range>
         <!-- Package exports -->
         <email.transport.package.export.version>${project.version}</email.transport.package.export.version>
-        <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
-        <maven.findbugs.plugin.version>3.0.3</maven.findbugs.plugin.version>
         <testng.version>6.9.10</testng.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <com.icegreen.version>1.5.5</com.icegreen.version>
