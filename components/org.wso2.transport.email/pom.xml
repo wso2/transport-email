@@ -42,10 +42,6 @@
             <groupId>org.wso2.carbon.polling.core</groupId>
             <artifactId>org.wso2.carbon.connector.framework</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.wso2.transport.file</groupId>-->
-            <!--<artifactId>org.wso2.transport.file</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
