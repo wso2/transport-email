@@ -34,9 +34,9 @@
     </modules>
 
     <scm>
-        <url>https://github.com/wso2/carbon-transports.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/carbon-transports.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/carbon-transports.git</connection>
+        <url>https://github.com/wso2/transport-email.git</url>
+        <developerConnection>scm:git:https://github.com/wso2/transport-email.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2/transport-email.git</connection>
         <tag>HEAD</tag>
     </scm>
 
