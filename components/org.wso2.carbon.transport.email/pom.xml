@@ -28,7 +28,6 @@
     <packaging>jar</packaging>
     <name>WSO2 Carbon Transport Email Component</name>
     <artifactId>org.wso2.carbon.transport.email</artifactId>
-
     <dependencies>
         <dependency>
             <groupId>com.sun.mail</groupId>
@@ -39,7 +38,7 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.transport</groupId>
+            <groupId>org.wso2.carbon.polling.core</groupId>
             <artifactId>org.wso2.carbon.connector.framework</artifactId>
         </dependency>
         <dependency>
