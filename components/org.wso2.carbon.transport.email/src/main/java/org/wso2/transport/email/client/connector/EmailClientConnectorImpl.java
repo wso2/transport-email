@@ -22,25 +22,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.transport.email.contract.EmailClientConnector;
 import org.wso2.transport.email.contract.message.EmailBaseMessage;
+import org.wso2.transport.email.contract.message.EmailMessage;
 import org.wso2.transport.email.contract.message.EmailTextMessage;
 import org.wso2.transport.email.exception.EmailConnectorException;
 import org.wso2.transport.email.utils.Constants;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * Implementation of {@link EmailClientConnector}
@@ -93,7 +102,7 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
         //mail server properties start with mail.smtp. Get them from properties map and put into serverProperties
         try {
             properties.forEach((key, value) -> {
-                if (key.startsWith("mail.smtp")) {
+                if (key.startsWith("mail.smtp") || key.startsWith("mail.store")) {
                     serverProperties.put(key, value);
                 }
             });
@@ -239,17 +248,34 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
             contentType = Constants.DEFAULT_CONTENT_TYPE;
         }
 
+        try {
         if (emailMessage instanceof EmailTextMessage) {
             textData = ((EmailTextMessage) emailMessage).getText();
             if (textData == null) {
                 throw new EmailConnectorException("Email message content couldn't be null");
             }
+            message.setContent(textData, contentType);
+        } else if (emailMessage instanceof EmailMessage) {
+            EmailMessage emailMsg = (EmailMessage) emailMessage;
+            String text = emailMsg.getText();
+            String[] attachments = emailMsg.getAttachments();
+            Multipart multipart = new MimeMultipart();
+
+            if (text != null) {
+                MimeBodyPart messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setContent(text, contentType);
+                multipart.addBodyPart(messageBodyPart);
+            }
+            if (attachments != null) {
+                for (String path : attachments) {
+                    attachFiles(message, multipart, path);
+                }
+            }
+            message.setContent(multipart);
         } else {
             throw new EmailConnectorException("Email client connector only support EmailTextMessage");
         }
 
-        try {
-            message.setContent(textData, contentType);
             if (emailMessage.getHeader(Constants.MAIL_HEADER_SUBJECT) != null) {
                 message.setSubject(emailMessage.getHeader(Constants.MAIL_HEADER_SUBJECT));
             } else {
@@ -322,5 +348,26 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
         protected PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(username, password);
         }
+    }
+
+    private static void attachFiles(Message message, Multipart multipart, String sourcePath) throws MessagingException {
+        File source = new File(sourcePath);
+
+        if (source.isDirectory()) {
+            for (File file : source.listFiles()) {
+                attachFile(message, multipart, file);
+            }
+        } else if (source.isFile()) {
+            attachFile(message, multipart, source);
+        }
+        message.setContent(multipart);
+    }
+
+    private static void attachFile(Message message, Multipart multipart, File file) throws MessagingException {
+        MimeBodyPart attachPart = new MimeBodyPart();
+        DataSource source = new FileDataSource(file.getAbsolutePath());
+        attachPart.setDataHandler(new DataHandler(source));
+        attachPart.setFileName(file.getName());
+        multipart.addBodyPart(attachPart);
     }
 }
