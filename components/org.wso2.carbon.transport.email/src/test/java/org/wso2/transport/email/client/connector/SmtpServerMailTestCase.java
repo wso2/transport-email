@@ -20,9 +20,11 @@ package org.wso2.transport.email.client.connector;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.messaging.exceptions.ClientConnectorException;
@@ -30,15 +32,20 @@ import org.wso2.transport.email.connector.factory.EmailConnectorFactoryImpl;
 import org.wso2.transport.email.contract.EmailClientConnector;
 import org.wso2.transport.email.contract.EmailConnectorFactory;
 import org.wso2.transport.email.contract.message.EmailBaseMessage;
+import org.wso2.transport.email.contract.message.EmailMultipartMessage;
 import org.wso2.transport.email.contract.message.EmailTextMessage;
 import org.wso2.transport.email.exception.EmailConnectorException;
 import org.wso2.transport.email.utils.EmailTestConstant;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
 
 /**
  * Class implementing test cases to test email sender. GreenMail is used to create local smtp server.
@@ -51,6 +58,13 @@ public class SmtpServerMailTestCase {
     private static final String HOST = "127.0.0.1";
     private Map<String, String> initProperties;
     private GreenMail mailServer;
+    private String rootPath;
+
+    @BeforeClass
+    public void init() {
+        ClassLoader classLoader = SmtpServerMailTestCase.class.getClassLoader();
+        rootPath = classLoader.getResource("files").getFile();
+    }
 
     @BeforeMethod(description = "setup parameters need to create a smtp server.")
     public void setMailSenderParameters() {
@@ -82,7 +96,7 @@ public class SmtpServerMailTestCase {
         EmailConnectorFactory connectorFactory = new EmailConnectorFactoryImpl();
         EmailClientConnector clientConnector = connectorFactory.createEmailClientConnector();
         clientConnector.init(initProperties);
-        EmailBaseMessage emailMessage = createEmailMessage("This is test message", "text/plain",
+        EmailBaseMessage emailMessage = createEmailTextMessage("This is test message", "text/plain",
                 "This is test message", "to@localhost", "cc@localhost", "bcc@localhost");
         emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_IN_REPLY_TO, "ab@localHost");
         emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_REPLY_TO, "replyto@localHost");
@@ -102,7 +116,7 @@ public class SmtpServerMailTestCase {
         EmailConnectorFactory connectorFactory = new EmailConnectorFactoryImpl();
         EmailClientConnector clientConnector = connectorFactory.createEmailClientConnector();
         clientConnector.init(initProperties);
-        EmailBaseMessage emailMessage = createEmailMessage("This is test message", "text/html",
+        EmailBaseMessage emailMessage = createEmailTextMessage("This is test message", "text/html",
                 "This is test message", "to1@localhost, to2@localhost, to3@localhost", null, null);
         clientConnector.send(emailMessage);
         Thread.sleep(1000);
@@ -120,7 +134,7 @@ public class SmtpServerMailTestCase {
         EmailConnectorFactory connectorFactory = new EmailConnectorFactoryImpl();
         EmailClientConnector clientConnector = connectorFactory.createEmailClientConnector();
         clientConnector.init(initProperties);
-        EmailBaseMessage emailMessage = createEmailMessage("This is test message", "attachment",
+        EmailBaseMessage emailMessage = createEmailTextMessage("This is test message", "attachment",
                 "This is test message", "to1@localhost, to2@localhost, to3@localhost", null, null);
         clientConnector.send(emailMessage);
     }
@@ -137,9 +151,9 @@ public class SmtpServerMailTestCase {
         EmailClientConnector clientConnector = connectorFactory.createEmailClientConnector();
         clientConnector.init(initProperties);
 
-        EmailBaseMessage emailMessage1 = createEmailMessage("This is test message",
+        EmailBaseMessage emailMessage1 = createEmailTextMessage("This is test message",
                 "text/plain", "This is test message", "to1@localhost", null, null);
-        EmailBaseMessage emailMessage2 = createEmailMessage("This is second test message",
+        EmailBaseMessage emailMessage2 = createEmailTextMessage("This is second test message",
                 "text/plain", "This is test message", "to2@localhost", null, null);
 
         clientConnector.send(emailMessage1);
@@ -189,6 +203,29 @@ public class SmtpServerMailTestCase {
         clientConnector.init(initProperties);
     }
 
+    @Test(description = "Test case to send emails via smtp server.")
+    public void sendingEmailWithAttachmentsViaSmtpServerTestCase()
+            throws Exception {
+        // create user on mail server
+        mailServer.setUser(ADDRESS, USERNAME, PASSWORD);
+        EmailConnectorFactory connectorFactory = new EmailConnectorFactoryImpl();
+        EmailClientConnector clientConnector = connectorFactory.createEmailClientConnector();
+        clientConnector.init(initProperties);
+        List<String> fileList = new ArrayList<>();
+        fileList.add(rootPath);
+        EmailBaseMessage emailMessage =
+                createEmailMultipartMessage("This is test message with attachments", "text/plain", fileList,
+                "This is test message", "to@localhost", "cc@localhost", "bcc@localhost");
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_IN_REPLY_TO, "ab@localHost");
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_REPLY_TO, "replyto@localHost");
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_MESSAGE_ID, "1234");
+        clientConnector.send(emailMessage);
+        Thread.sleep(1000);
+        MimeMessage[] messages = mailServer.getReceivedMessages();
+        Assert.assertEquals(messages.length, 3);
+    }
+
+
     /**
      * Method implemented to create a email text message with relevant headers and properties.
      *
@@ -200,10 +237,23 @@ public class SmtpServerMailTestCase {
      * @param bcc           Bcc recipients of the email
      * @return              EmailBaseMessage created by setting headers and properties.
      */
-    EmailBaseMessage createEmailMessage(String content, String contentType, String subject, String to,
-            String cc, String bcc) {
+    private EmailBaseMessage createEmailTextMessage(String content, String contentType, String subject, String to,
+                                            String cc, String bcc) {
         EmailBaseMessage emailMessage = new EmailTextMessage(content);
         emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_CONTENT_TYPE, contentType);
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_SUBJECT, subject);
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_TO, to);
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_CC, cc);
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_BCC, bcc);
+
+        return emailMessage;
+    }
+
+    private EmailBaseMessage createEmailMultipartMessage(String textContent, String textContentType, List<String>
+            fileList,
+                                                 String subject, String to, String cc, String bcc) {
+        EmailBaseMessage emailMessage = new EmailMultipartMessage(textContent, fileList);
+        emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_CONTENT_TYPE, textContentType);
         emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_SUBJECT, subject);
         emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_TO, to);
         emailMessage.setHeader(EmailTestConstant.MAIL_HEADER_CC, cc);
