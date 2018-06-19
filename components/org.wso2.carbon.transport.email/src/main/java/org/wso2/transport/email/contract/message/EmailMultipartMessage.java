@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,14 +18,16 @@
 
 package org.wso2.transport.email.contract.message;
 
+import java.util.List;
+
 /**
  * This class represent the Email message which can contain both text and attachments.
  */
-public class EmailMessage extends EmailBaseMessage {
+public class EmailMultipartMessage extends EmailBaseMessage {
     private final String text;
-    private String[] attachments;
+    private List<String> attachments;
 
-    public EmailMessage(String text, String[] attachments) {
+    public EmailMultipartMessage(String text, List<String> attachments) {
         this.text = text;
         this.attachments = attachments;
     }
@@ -44,7 +46,7 @@ public class EmailMessage extends EmailBaseMessage {
      *
      * @return array of file paths that needs to be attached to the email.
      */
-    public String[] getAttachments() {
-        return this.attachments;
+    public List<String> getAttachments() {
+        return attachments;
     }
 }

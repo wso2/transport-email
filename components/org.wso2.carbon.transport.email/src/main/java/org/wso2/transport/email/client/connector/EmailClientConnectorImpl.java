@@ -22,12 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wso2.transport.email.contract.EmailClientConnector;
 import org.wso2.transport.email.contract.message.EmailBaseMessage;
-import org.wso2.transport.email.contract.message.EmailMessage;
+import org.wso2.transport.email.contract.message.EmailMultipartMessage;
 import org.wso2.transport.email.contract.message.EmailTextMessage;
 import org.wso2.transport.email.exception.EmailConnectorException;
 import org.wso2.transport.email.utils.Constants;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -249,32 +250,32 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
         }
 
         try {
-        if (emailMessage instanceof EmailTextMessage) {
-            textData = ((EmailTextMessage) emailMessage).getText();
-            if (textData == null) {
-                throw new EmailConnectorException("Email message content couldn't be null");
-            }
-            message.setContent(textData, contentType);
-        } else if (emailMessage instanceof EmailMessage) {
-            EmailMessage emailMsg = (EmailMessage) emailMessage;
-            String text = emailMsg.getText();
-            String[] attachments = emailMsg.getAttachments();
-            Multipart multipart = new MimeMultipart();
-
-            if (text != null) {
-                MimeBodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setContent(text, contentType);
-                multipart.addBodyPart(messageBodyPart);
-            }
-            if (attachments != null) {
-                for (String path : attachments) {
-                    attachFiles(message, multipart, path);
+            if (emailMessage instanceof EmailTextMessage) {
+                textData = ((EmailTextMessage) emailMessage).getText();
+                if (textData == null) {
+                    throw new EmailConnectorException("Email message content couldn't be null");
                 }
+                message.setContent(textData, contentType);
+            } else if (emailMessage instanceof EmailMultipartMessage) {
+                EmailMultipartMessage emailMsg = (EmailMultipartMessage) emailMessage;
+                String text = emailMsg.getText();
+                List<String> attachments = emailMsg.getAttachments();
+                Multipart multipart = new MimeMultipart();
+                if (text != null) {
+                    MimeBodyPart messageBodyPart = new MimeBodyPart();
+                    messageBodyPart.setContent(text, contentType);
+                    multipart.addBodyPart(messageBodyPart);
+                }
+                if (attachments != null) {
+                    for (String path : attachments) {
+                        attachFiles(message, multipart, path);
+                    }
+                }
+                message.setContent(multipart);
+            } else {
+                throw new EmailConnectorException("Email client connector only support " +
+                        "EmailTextMessage or EmailMultipartMessage");
             }
-            message.setContent(multipart);
-        } else {
-            throw new EmailConnectorException("Email client connector only support EmailTextMessage");
-        }
 
             if (emailMessage.getHeader(Constants.MAIL_HEADER_SUBJECT) != null) {
                 message.setSubject(emailMessage.getHeader(Constants.MAIL_HEADER_SUBJECT));
@@ -324,12 +325,10 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
                 message.setHeader(Constants.MAIL_HEADER_REFERENCES,
                         emailMessage.getHeader(Constants.MAIL_HEADER_REFERENCES));
             }
-
         } catch (MessagingException e) {
             throw new EmailConnectorException(
                     "Error occurred while creating the email " + "using given carbon message. " + e.getMessage(), e);
         }
-
         return message;
     }
 
@@ -352,18 +351,20 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
 
     private static void attachFiles(Message message, Multipart multipart, String sourcePath) throws MessagingException {
         File source = new File(sourcePath);
-
         if (source.isDirectory()) {
-            for (File file : source.listFiles()) {
-                attachFile(message, multipart, file);
+            File[] files = source.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    attachFile(multipart, file);
+                }
             }
         } else if (source.isFile()) {
-            attachFile(message, multipart, source);
+            attachFile(multipart, source);
         }
         message.setContent(multipart);
     }
 
-    private static void attachFile(Message message, Multipart multipart, File file) throws MessagingException {
+    private static void attachFile(Multipart multipart, File file) throws MessagingException {
         MimeBodyPart attachPart = new MimeBodyPart();
         DataSource source = new FileDataSource(file.getAbsolutePath());
         attachPart.setDataHandler(new DataHandler(source));
