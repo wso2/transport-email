@@ -46,4 +46,21 @@ public interface EmailClientConnector {
       */
      void send(EmailBaseMessage emailMessage)
             throws EmailConnectorException;
+
+     /**
+      * Returns whether the connection is active
+      */
+     boolean isConnected();
+
+     /**
+      * Disconnects the active connection
+      */
+     void disconnect();
+
+     /**
+      * Connects to the mail server
+      *
+      * @throws EmailConnectorException on error while connecting to the server.
+      */
+     void connect() throws EmailConnectorException;
 }

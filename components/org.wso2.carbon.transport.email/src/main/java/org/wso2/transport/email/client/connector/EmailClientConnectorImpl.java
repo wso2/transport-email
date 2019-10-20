@@ -35,7 +35,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -211,6 +210,32 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
                     }
                 }
             }, waitTimeBeforeConnectionClose, TimeUnit.MINUTES);
+        }
+    }
+
+    @Override
+    public boolean isConnected() {
+        return transport.isConnected();
+    }
+
+    @Override
+    public void disconnect() {
+        try {
+            if (transport != null) {
+                transport.close();
+            }
+        } catch (Exception e) {
+            logger.warn("Error encountered while closing the connection to the mail server" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void connect() throws EmailConnectorException {
+        try {
+            transport.connect();
+        } catch (MessagingException e) {
+            throw new EmailConnectorException("Error encountered while connecting to the mail server" +
+                    e.getMessage(), e);
         }
     }
 
