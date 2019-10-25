@@ -350,6 +350,12 @@ public class EmailClientConnectorImpl implements EmailClientConnector {
                 message.setHeader(Constants.MAIL_HEADER_REFERENCES,
                         emailMessage.getHeader(Constants.MAIL_HEADER_REFERENCES));
             }
+            // Custom headers are handled below
+            for (Map.Entry<String, String> entry : emailMessage.getHeaders().entrySet()) {
+                if (entry.getKey().startsWith(Constants.MAIL_CUSTOM_HEADER_IDENTIFIER)) {
+                    message.setHeader(entry.getKey().split(Constants.CUSTOM_HEADER_DELIMITER)[1], entry.getValue());
+                }
+            }
         } catch (MessagingException e) {
             throw new EmailConnectorException(
                     "Error occurred while creating the email " + "using given carbon message. " + e.getMessage(), e);
