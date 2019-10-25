@@ -225,6 +225,31 @@ public class SmtpServerMailTestCase {
         Assert.assertEquals(messages.length, 3);
     }
 
+    @Test(description = "Test case to send emails via smtp server with custom headers set.")
+    public void sendingWithCustomHeaders()
+            throws  MessagingException, InterruptedException,
+                   EmailConnectorException {
+
+        // create user on mail server
+        mailServer.setUser(ADDRESS, USERNAME, PASSWORD);
+        EmailConnectorFactory connectorFactory = new EmailConnectorFactoryImpl();
+        EmailClientConnector clientConnector = connectorFactory.createEmailClientConnector();
+        clientConnector.init(initProperties);
+
+        EmailBaseMessage emailMessage = createEmailTextMessage("This is test message",
+                                                                "text/plain", "This is test message",
+                                                               "to1@localhost", null, null);
+        Map<String, String> customHeaders = new HashMap<>();
+        customHeaders.put("customHeader_email-header-name", "custom-email-header-value");
+        emailMessage.setHeaders(customHeaders);
+        clientConnector.send(emailMessage);
+        Thread.sleep(1000);
+        MimeMessage[] messages = mailServer.getReceivedMessages();
+        Assert.assertEquals(messages.length, 1);
+        Assert.assertEquals(messages[0].getHeader("email-header-name").length, 1);
+        Assert.assertEquals(messages[0].getHeader("email-header-name")[0], "custom-email-header-value");
+    }
+
 
     /**
      * Method implemented to create a email text message with relevant headers and properties.

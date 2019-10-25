@@ -23,6 +23,9 @@ package org.wso2.transport.email.utils;
  */
 public class Constants {
 
+    public static final String MAIL_CUSTOM_HEADER_IDENTIFIER = "customHeader_";
+    public static final String CUSTOM_HEADER_DELIMITER = "_";
+
     private Constants(){};
     /**
      * Email server Connector property
